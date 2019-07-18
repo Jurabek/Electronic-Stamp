@@ -16,7 +16,7 @@ namespace ElectronicStamp
         public static void Start()
         {
             System.IO.Directory.CreateDirectory("output");
-            using (Image<Rgba32> img = new Image<Rgba32>(800, 1000))
+            using (Image<Rgba32> img = new Image<Rgba32>(400, 400))
             {
                 
                 var mainRectSize = new SizeF(260, 180);
@@ -32,7 +32,6 @@ namespace ElectronicStamp
                 var centerRect = new RectangleF(centerRectPoint, centerRectSize);
                 
                 
-                var font = SystemFonts.CreateFont("Arial", 39, FontStyle.Regular);
                 var titleOptions = new TextGraphicsOptions()
                 {
                     WrapTextWidth = mainRect.Width,
@@ -52,29 +51,53 @@ namespace ElectronicStamp
                 var dateFont = SystemFonts.CreateFont("Arial", 20, FontStyle.Regular);
                 
                 
-                string text = "Hello World Hello World Hello World Hello World Hello World";
-                var textGraphicsOptions = new TextGraphicsOptions(true) // draw the text along the path wrapping at the end of the line
+                
+                var bottomTitleFont = SystemFonts.CreateFont("Arial", 14, FontStyle.Regular);
+                var bottomTitle = "Ворид шуд №";
+                var bottomTitleGraphicsOptions = new TextGraphicsOptions(true) // draw the text along the path wrapping at the end of the line
                 {
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Left
                 };
-
-                // lets generate the text as a set of vectors drawn along the path
-
-                var glyphs = SixLabors.Shapes.TextBuilder.GenerateGlyphs(text, new RendererOptions(font, textGraphicsOptions.DpiX, textGraphicsOptions.DpiY)
+                var bottomTitlePoint = new PointF(mainRectPoint.X + 10, mainRectPoint.Y + mainRectSize.Height - 15);
+                
+                var bottomTitleGlyphs = TextBuilder.GenerateGlyphs(bottomTitle, 
+                    new RendererOptions(bottomTitleFont, bottomTitlePoint)
                 {
-                    HorizontalAlignment = textGraphicsOptions.HorizontalAlignment,
-                    TabWidth = textGraphicsOptions.TabWidth,
-                    VerticalAlignment = textGraphicsOptions.VerticalAlignment,
-                    WrappingWidth = textGraphicsOptions.WrapTextWidth,
-                    ApplyKerning = textGraphicsOptions.ApplyKerning
+                    HorizontalAlignment = bottomTitleGraphicsOptions.HorizontalAlignment,
+                    TabWidth = bottomTitleGraphicsOptions.TabWidth,
+                    VerticalAlignment = bottomTitleGraphicsOptions.VerticalAlignment,
+                    WrappingWidth = bottomTitleGraphicsOptions.WrapTextWidth,
+                    ApplyKerning = bottomTitleGraphicsOptions.ApplyKerning
                 });
 
+                var entryNumberFont = SystemFonts.CreateFont("Arial", 38);
+                var entryNumberGraphicsOptions = new TextGraphicsOptions(true) // draw the text along the path wrapping at the end of the line
+                {
+                    VerticalAlignment = VerticalAlignment.Center,
+                    HorizontalAlignment = HorizontalAlignment.Left
+                };
+                var entryNumberPoint = new PointF(mainRectPoint.X + bottomTitleGlyphs.Bounds.Width + 20, mainRectPoint.Y + mainRectSize.Height - 25);
+                
+                var entryNumberGlyphs = TextBuilder.GenerateGlyphs("12343", 
+                    new RendererOptions(entryNumberFont, entryNumberPoint)
+                    {
+                        HorizontalAlignment = entryNumberGraphicsOptions.HorizontalAlignment,
+                        TabWidth = entryNumberGraphicsOptions.TabWidth,
+                        VerticalAlignment = entryNumberGraphicsOptions.VerticalAlignment,
+                        WrappingWidth = entryNumberGraphicsOptions.WrapTextWidth,
+                        ApplyKerning = entryNumberGraphicsOptions.ApplyKerning
+                    });
+
+                
                 img.Mutate(ctx => ctx
                     .Fill(Rgba32.White)
                     .Draw(Rgba32.Red, 1, mainRect)
                     .Draw(Rgba32.Red, 1, centerRect)
-                    .DrawText( titleOptions, title, titleFont, Rgba32.Red, titlePoint)
+                    .DrawText(titleOptions, title, titleFont, Rgba32.Red, titlePoint)
                     .DrawText(dateOptions, "11 МАЙ 2019", dateFont, Rgba32.Red, datePoint)
-                    .Fill((GraphicsOptions)textGraphicsOptions, Rgba32.Black, glyphs));
+                    .Fill(Rgba32.Red, bottomTitleGlyphs)
+                    .Fill(Rgba32.Blue, entryNumberGlyphs));
 
                 img.Save("output/Rect.png");
             }
